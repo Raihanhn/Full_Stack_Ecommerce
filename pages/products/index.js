@@ -1,33 +1,21 @@
 import Link from "next/link";
-import { useSelector } from "react-redux";
 
-export default function Home({ products }) {
-  const cartItems = useSelector((state) => state.cart.items);
-
+export default function Products({ products }) {
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="text-center py-16 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-        <h1 className="text-4xl font-bold mb-4">Welcome to MyStore</h1>
-        <p className="text-lg mb-6">
-          Browse our latest products and shop with confidence!
-        </p>
-        <Link href="/products">
-          <span className="px-6 py-3 bg-white text-blue-600 rounded-full font-semibold hover:bg-gray-100 transition cursor-pointer">
-            Shop Now
-          </span>
-        </Link>
-      </section>
-
-      {/* Featured Products Grid */}
-      <section className="max-w-7xl mx-auto py-12 px-6">
-        <h2 className="text-2xl font-bold mb-8 text-gray-800">Featured Products</h2>
+    <div className="min-h-screen bg-gray-50 py-10 px-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Page Heading */}
+        <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+          Our Products
+        </h1>
+        {/* Product Grid */}
         <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {products.map((product) => (
             <div
               key={product._id}
-              className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition"
+              className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow"
             >
+              {/* Product Image */}
               <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
                 {product.image ? (
                   <img
@@ -39,11 +27,15 @@ export default function Home({ products }) {
                   <span className="text-gray-400">No Image</span>
                 )}
               </div>
+
+              {/* Product Info */}
               <div className="p-4 flex flex-col justify-between h-40">
                 <h2 className="text-lg font-semibold text-gray-800 truncate">
                   {product.title}
                 </h2>
                 <p className="text-gray-600 mt-1">${product.price}</p>
+
+                {/* View Details Button */}
                 <Link href={`/products/${product._id}`}>
                   <span className="mt-4 inline-block text-center w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition">
                     View Details
@@ -53,12 +45,12 @@ export default function Home({ products }) {
             </div>
           ))}
         </div>
-      </section>
+      </div>
     </div>
   );
 }
 
-// Fetch products from API for home page
+// SSR: Fetch products from API
 export async function getServerSideProps() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`);
   const data = await res.json();
