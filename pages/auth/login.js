@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { useDispatch } from "react-redux";  // ✅ Import dispatch
+import { login } from "@/redux/userSlice";   // ✅ Import your Redux login action
 
 export default function Login() {
   const router = useRouter();
+  const dispatch = useDispatch();  // ✅ Initialize dispatch
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
 
@@ -24,7 +27,10 @@ export default function Login() {
       const data = await res.json();
 
       if (data.success) {
-        // Save JWT token to localStorage
+        // ✅ Dispatch Redux login
+        dispatch(login({ ...data.user, token: data.token }));
+
+        // ✅ Save JWT token in localStorage (optional, for API requests)
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
@@ -83,5 +89,3 @@ export default function Login() {
     </div>
   );
 }
-
-

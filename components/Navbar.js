@@ -1,13 +1,16 @@
 // components/Navbar.js
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../redux/userSlice";
 
 export default function Navbar() {
   const cartItems = useSelector((state) => state.cart.items);
+  const user = useSelector((state) => state.user.user); // Redux user
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef();
+  const dispatch = useDispatch();
 
   // Close profile dropdown if clicked outside
   useEffect(() => {
@@ -19,6 +22,12 @@ export default function Navbar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleLogout = () => {
+    dispatch(logout()); // update Redux state
+    setProfileOpen(false);
+    setMenuOpen(false);
+  };
 
   return (
     <nav className="bg-white shadow-md w-full fixed top-0 z-50">
@@ -59,30 +68,32 @@ export default function Navbar() {
 
           {/* Right Side */}
           <div className="flex items-center space-x-4">
-            {/* Cart */}
-            <Link href="/cart">
-              <div className="relative cursor-pointer">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-gray-700 hover:text-blue-600 transition"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4M7 13L5.4 5M16 21a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-                {cartItems.length > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-2">
-                    {cartItems.length}
-                  </span>
-                )}
-              </div>
-            </Link>
+            {/* Cart - only show if user logged in */}
+            {user && (
+              <Link href="/cart">
+                <div className="relative cursor-pointer">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-gray-700 hover:text-blue-600 transition"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4M7 13L5.4 5M16 21a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
+                  </svg>
+                  {cartItems.length > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-2">
+                      {cartItems.length}
+                    </span>
+                  )}
+                </div>
+              </Link>
+            )}
 
             {/* Profile */}
             <div className="relative" ref={profileRef}>
@@ -90,20 +101,34 @@ export default function Navbar() {
                 onClick={() => setProfileOpen(!profileOpen)}
                 className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 hover:bg-gray-400 transition"
               >
-                <span className="text-sm font-bold">P</span>
+                <span className="text-sm font-bold">
+                  {user ? user.name.charAt(0).toUpperCase() : "P"}
+                </span>
               </button>
               {profileOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-lg py-2 z-50">
-                  <Link href="/signin">
-                    <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
-                      Sign In
+                <div className="absolute right-0 mt-4 w-40 bg-white border-none rounded-b-md shadow-lg py-2 z-50">
+                  {!user && (
+                    <>
+                      <Link href="/auth/login">
+                        <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+                          Sign In
+                        </div>
+                      </Link>
+                      <Link href="/auth/signup">
+                        <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+                          Sign Up
+                        </div>
+                      </Link>
+                    </>
+                  )}
+                  {user && (
+                    <div
+                      onClick={handleLogout}
+                      className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
+                    >
+                      Logout
                     </div>
-                  </Link>
-                  <Link href="/signup">
-                    <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
-                      Sign Up
-                    </div>
-                  </Link>
+                  )}
                 </div>
               )}
             </div>
@@ -158,12 +183,24 @@ export default function Navbar() {
           <Link href="/about">
             <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">About</div>
           </Link>
-          <Link href="/signin">
-            <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">Sign In</div>
-          </Link>
-          <Link href="/signup">
-            <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">Sign Up</div>
-          </Link>
+          {!user && (
+            <>
+              <Link href="/auth/login">
+                <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">Sign In</div>
+              </Link>
+              <Link href="/auth/signup">
+                <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">Sign Up</div>
+              </Link>
+            </>
+          )}
+          {user && (
+            <div
+              onClick={handleLogout}
+              className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
+            >
+              Logout
+            </div>
+          )}
         </div>
       )}
     </nav>
