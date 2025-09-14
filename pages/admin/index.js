@@ -27,7 +27,26 @@ export default function AdminDashboard({ stats }) {
   );
 }
 
-export async function getServerSideProps() {
+
+export async function getServerSideProps({ req }) {
+  const token = req.cookies.token; // 👈 must be set when login
+
+  if (!token) {
+    return { redirect: { destination: "/login", permanent: false } };
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    return { redirect: { destination: "/login", permanent: false } };
+  }
+
+  // ✅ check if user is admin
+  if (decoded.role !== "admin") {
+    return { redirect: { destination: "/", permanent: false } };
+  }
+
   await connectDB();
 
   const products = await Product.countDocuments();
@@ -40,3 +59,4 @@ export async function getServerSideProps() {
     },
   };
 }
+
