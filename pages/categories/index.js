@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function Categories({ categories }) {
+export default function Categories({ categories, products = [] }) {
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-6">
       <div className="max-w-7xl mx-auto mt-10">
@@ -23,20 +23,74 @@ export default function Categories({ categories }) {
             </Link>
           ))}
         </div>
+
+        {/* All Products Section */}
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold mb-8 text-gray-800 text-center">
+            All Products
+          </h2>
+          {products.length === 0 ? (
+            <p className="text-center text-gray-600">No products available.</p>
+          ) : (
+            <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {products.map((product) => (
+                <div
+                  key={product._id}
+                  className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition"
+                >
+                  <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+                    {product.image ? (
+                      <img
+                        src={product.image}
+                        alt={product.title}
+                        className="object-cover h-full w-full"
+                      />
+                    ) : (
+                      <span className="text-gray-400">No Image</span>
+                    )}
+                  </div>
+                  <div className="p-4 flex flex-col justify-between h-40">
+                    <h2 className="text-lg font-semibold text-gray-800 truncate">
+                      {product.title}
+                    </h2>
+                    <p className="text-gray-600 mt-1">${product.price}</p>
+                    <Link href={`/products/${product._id}`}>
+                      <span className="mt-4 inline-block text-center w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition">
+                        View Details
+                      </span>
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-// Fetch categories from API
+// Fetch categories and products
 export async function getStaticProps() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories`);
-  const data = await res.json();
+  const [categoriesRes, productsRes] = await Promise.all([
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories`),
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`),
+  ]);
+
+  const categoriesData = await categoriesRes.json();
+  const productsData = await productsRes.json();
 
   return {
     props: {
-      categories: data.categories || ["electronics", "fashion", "books", "toys", "beauty"],
+      categories: categoriesData.categories || [
+        "electronics",
+        "fashion",
+        "books",
+        "toys",
+        "beauty",
+      ],
+      products: productsData.products || [],
     },
-    revalidate: 60, // optional
+    revalidate: 60,
   };
 }
