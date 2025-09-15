@@ -8,7 +8,17 @@ const handler = async (req, res) => {
   // GET: Public access
   if (req.method === "GET") {
     try {
-      const products = await Product.find();
+       const { category } = req.query;  // 👈 read query param
+      let products;
+
+      if (category) {
+        // Filter by category
+        products = await Product.find({ category });
+      } else {
+        // Otherwise return all
+        products = await Product.find();
+      }
+      
       return res.status(200).json({ success: true, products });
     } catch (error) {
       return res.status(500).json({ success: false, error: error.message });

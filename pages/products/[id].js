@@ -19,7 +19,7 @@ export default function ProductDetail({ product }) {
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-6">
-      <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-10">
+      <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-10 mt-10">
         {/* Product Image */}
         <div className="bg-white rounded-2xl shadow-md overflow-hidden flex items-center justify-center">
           {product.image ? (
