@@ -31,8 +31,8 @@ export default function Cart() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-6">
-      <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-md p-6">
+    <div className="min-h-screen bg-gray-50 py-10 px-6"> 
+      <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-md p-6 mt-12"> 
         <h1 className="text-2xl font-bold mb-6">Your Cart</h1>
 
         <div className="space-y-4">
@@ -89,12 +89,12 @@ export default function Cart() {
         <div className="mt-6 flex justify-between items-center">
           <h2 className="text-xl font-bold">Total: ${total}</h2>
           <div className="space-x-4">
-            <button
+            <span
               onClick={handleClear}
-              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition"
+              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition cursor-pointer"
             >
               Clear Cart
-            </button>
+            </span>
             <Link href="/checkout">
               <span className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition cursor-pointer">
                 Checkout

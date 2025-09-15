@@ -1,10 +1,8 @@
-import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../redux/cartSlice";
 
 export default function ProductDetail({ product }) {
     const dispatch = useDispatch();
-  const router = useRouter();
 
    const handleAddToCart = () => {
     dispatch(addToCart(product));
@@ -69,28 +67,36 @@ export default function ProductDetail({ product }) {
   );
 }
 
-// SSR: Fetch single product
-export async function getServerSideProps({ params }) {
+// Generate all product paths at build time
+export async function getStaticPaths() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`);
+  const products = await res.json();
+
+  const paths = products.products.map((product) => ({
+    params: { id: product._id },
+  }));
+
+  return {
+    paths,
+    fallback: "blocking", // if product page not pre-rendered, generate it on demand
+  };
+}
+
+// Fetch product data at build time
+export async function getStaticProps({ params }) {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${params.id}`
     );
-
-    if (!res.ok) {
-      // Product not found, return null
-      return { props: { product: null } };
-    }
-
     const data = await res.json();
 
     return {
       props: {
         product: data.product || null,
       },
+      revalidate: 60, // optional: regenerate the page every 60s
     };
   } catch (err) {
-    console.error(err);
     return { props: { product: null } };
   }
 }
-
