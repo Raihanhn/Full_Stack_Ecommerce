@@ -6,6 +6,7 @@ import { logout } from "../redux/userSlice";
 
 export default function Navbar() {
   const cartItems = useSelector((state) => state.cart.items);
+  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const user = useSelector((state) => state.user.user); // Redux user
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -86,12 +87,27 @@ export default function Navbar() {
                       d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4M7 13L5.4 5M16 21a2 2 0 11-4 0 2 2 0 014 0z"
                     />
                   </svg>
-                  {cartItems.length > 0 && (
+                  {totalQuantity > 0 && (
                     <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-2">
-                      {cartItems.length}
+                      {totalQuantity}
                     </span>
                   )}
                 </div>
+                {totalQuantity > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-2">
+                    {totalQuantity}
+                  </span>
+                )}
+                {totalQuantity > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-2">
+                    {totalQuantity}
+                  </span>
+                )}
+                {totalQuantity > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-2">
+                    {totalQuantity}
+                  </span>
+                )}
               </Link>
             )}
 
@@ -172,24 +188,36 @@ export default function Navbar() {
       {menuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200">
           <Link href="/">
-            <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">Home</div>
+            <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+              Home
+            </div>
           </Link>
           <Link href="/products">
-            <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">Products</div>
+            <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+              Products
+            </div>
           </Link>
           <Link href="/categories">
-            <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">Categories</div>
+            <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+              Categories
+            </div>
           </Link>
           <Link href="/about">
-            <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">About</div>
+            <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+              About
+            </div>
           </Link>
           {!user && (
             <>
               <Link href="/auth/login">
-                <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">Sign In</div>
+                <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+                  Sign In
+                </div>
               </Link>
               <Link href="/auth/signup">
-                <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">Sign Up</div>
+                <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+                  Sign Up
+                </div>
               </Link>
             </>
           )}

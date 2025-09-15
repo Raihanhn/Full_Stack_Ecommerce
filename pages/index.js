@@ -43,7 +43,7 @@ export default function Home({ products }) {
             placeholder="Search products..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 px-4 py-3 rounded-lg text-gray-800 border border-gray-400 outline-none placeholder-gray-400"
+            className="flex-1 px-4 py-3 rounded-lg text-white border border-white outline-none placeholder-white"
           />
           <button
             onClick={() => {}}
