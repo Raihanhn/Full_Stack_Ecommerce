@@ -99,8 +99,21 @@ export default function Navbar() {
             {/* Profile */}
             <div className="relative" ref={profileRef}>
               <button
-                onClick={() => setProfileOpen(!profileOpen)}
-                className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 hover:bg-gray-400 transition"
+                onClick={() => {
+                  if (window.innerWidth >= 768) {
+                    setProfileOpen(!profileOpen);
+                  }
+                }}
+                className={`
+                  h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center 
+                  text-gray-700 transition
+                  hover:bg-gray-400 
+                  md:cursor-pointer 
+                  cursor-default
+                `}
+                disabled={
+                  typeof window !== "undefined" && window.innerWidth < 768
+                }
               >
                 <span className="text-sm font-bold">
                   {user ? user.name.charAt(0).toUpperCase() : "P"}
