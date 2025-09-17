@@ -27,11 +27,11 @@ export default function CreateProduct() {
     } else {
       alert(data.message || data.error || "Error creating product");
     }
-  };
+  }; 
 
   return (
     <div className="p-6">
-      <h1 className="text-xl mb-4">Create Product</h1>
+      <h1 className="text-xl mb-4 mt-10">Create Product</h1> 
       <form onSubmit={submit} className="space-y-3 max-w-md">
         <input value={form.title} onChange={(e)=>setForm({...form,title:e.target.value})} placeholder="Title" className="w-full p-2 border rounded"/>
         <textarea value={form.description} onChange={(e)=>setForm({...form,description:e.target.value})} placeholder="Description" className="w-full p-2 border rounded"/>
