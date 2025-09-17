@@ -115,20 +115,17 @@ export default function Navbar() {
                   typeof window !== "undefined" && window.innerWidth < 768
                 }
               >
-                {/* <span className="text-sm font-bold">
-                  {user ? user.name.charAt(0).toUpperCase() : "P"}
-                </span> */}
-                  {user?.profileImage ? (
-    <img
-      src={user.profileImage}
-      alt="Profile"
-      className="h-full w-full object-cover"
-    />
-  ) : (
-    <span className="flex items-center justify-center h-full w-full text-sm font-bold text-gray-700">
-      {user ? user.name.charAt(0).toUpperCase() : "P"}
-    </span>
-  )}
+                {user?.profileImage ? (
+                  <img
+                    src={user.profileImage}
+                    alt="Profile"
+                    className="h-full w-full object-cover rounded-full"
+                  />
+                ) : (
+                  <span className="flex items-center justify-center h-full w-full text-sm font-bold text-gray-700">
+                    {user ? user.name.charAt(0).toUpperCase() : "P"}
+                  </span>
+                )}
               </button>
               {profileOpen && (
                 <div className="absolute right-0 mt-4 w-40 bg-white border-none rounded-b-md shadow-lg py-2 z-50">
@@ -146,30 +143,22 @@ export default function Navbar() {
                       </Link>
                     </>
                   )}
-                  {/* {user && (
-                    <div
-                      onClick={handleLogout}
-                      className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
-                    >
-                      Logout
-                    </div>
-                  )} */}
-                  {user && (
-  <>
-    <Link href="/profile">
-      <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
-        My Profile
-      </div>
-    </Link>
-    <div
-      onClick={handleLogout}
-      className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
-    >
-      Logout
-    </div>
-  </>
-)}
 
+                  {user && (
+                    <>
+                      <Link href="/profile">
+                        <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+                          My Profile
+                        </div>
+                      </Link>
+                      <div
+                        onClick={handleLogout}
+                        className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
+                      >
+                        Logout
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -247,25 +236,19 @@ export default function Navbar() {
             </>
           )}
           {user && (
-            // <div
-            //   onClick={handleLogout}
-            //   className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
-            // >
-            //   Logout
-            // </div>
-             <>
-    <Link href="/profile">
-      <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
-        My Profile
-      </div>
-    </Link>
-    <div
-      onClick={handleLogout}
-      className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
-    >
-      Logout
-    </div>
-  </>
+            <>
+              <Link href="/profile">
+                <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+                  My Profile
+                </div>
+              </Link>
+              <div
+                onClick={handleLogout}
+                className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
+              >
+                Logout
+              </div>
+            </>
           )}
         </div>
       )}
