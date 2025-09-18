@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { connectDB } from "@/lib/mongodb";
+import Product from "@/models/Product";
 
 export default function Products({ products }) {
   return (
@@ -50,14 +52,20 @@ export default function Products({ products }) {
   );
 }
 
-// SSR: Fetch products from API
+// SSR: Fetch products directly from MongoDB
 export async function getServerSideProps() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`);
-  const data = await res.json();
+  await connectDB();
+
+  const productsData = await Product.find().lean();
+
+  const products = productsData.map((p) => ({
+    ...p,
+    _id: p._id.toString(),
+  }));
 
   return {
     props: {
-      products: data.products || [],
+      products,
     },
   };
 }

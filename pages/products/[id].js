@@ -2,16 +2,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { addToCart } from "../../redux/cartSlice";
+import { connectDB } from "@/lib/mongodb";
+import Product from "@/models/Product";
 
 export default function ProductDetail({ product }) {
   const dispatch = useDispatch();
   const router = useRouter();
-  const user = useSelector((state) => state.user.user); // get logged-in user
+  const user = useSelector((state) => state.user.user); // logged-in user
 
   // Redirect if not logged in
   useEffect(() => {
     if (!user) {
-      router.replace("/auth/login"); // redirect to login
+      router.replace("/auth/login");
     }
   }, [user, router]);
 
@@ -28,7 +30,6 @@ export default function ProductDetail({ product }) {
     );
   }
 
-  // While redirecting, optionally show a loading state
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -74,7 +75,6 @@ export default function ProductDetail({ product }) {
             </p>
           </div>
 
-          {/* Add to Cart Button */}
           <button
             onClick={handleAddToCart}
             className="bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition"
@@ -87,35 +87,43 @@ export default function ProductDetail({ product }) {
   );
 }
 
-// getStaticPaths & getStaticProps remain the same
-export async function getStaticPaths() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`);
-  const products = await res.json();
+// ============================
+// SSG: fetch paths & props from MongoDB
+// ============================
 
-  const paths = products.products.map((product) => ({
-    params: { id: product._id },
+export async function getStaticPaths() {
+  await connectDB();
+
+  const products = await Product.find().select("_id").lean();
+
+  const paths = products.map((p) => ({
+    params: { id: p._id.toString() },
   }));
 
   return {
     paths,
-    fallback: "blocking",
+    fallback: "blocking", // generate pages on-demand
   };
 }
 
 export async function getStaticProps({ params }) {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${params.id}`
-    );
-    const data = await res.json();
+  await connectDB();
 
+  const productData = await Product.findById(params.id).lean();
+
+  if (!productData) {
     return {
-      props: {
-        product: data.product || null,
-      },
-      revalidate: 60,
+      notFound: true,
     };
-  } catch (err) {
-    return { props: { product: null } };
   }
+
+  const product = {
+    ...productData,
+    _id: productData._id.toString(),
+  };
+
+  return {
+    props: { product },
+    revalidate: 60, // ISR: regenerate every 60 seconds
+  };
 }
