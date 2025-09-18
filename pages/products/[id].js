@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { addToCart } from "../../redux/cartSlice";
+import Image from "next/image"; // ✅ Use Next.js Image
 
 export default function ProductDetail({ product }) {
   const dispatch = useDispatch();
@@ -41,12 +42,13 @@ export default function ProductDetail({ product }) {
     <div className="min-h-screen bg-gray-50 py-10 px-6">
       <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-10 mt-10">
         {/* Product Image */}
-        <div className="bg-white rounded-2xl shadow-md overflow-hidden flex items-center justify-center">
+        <div className="bg-white rounded-2xl shadow-md overflow-hidden flex items-center justify-center relative h-96">
           {product.image ? (
-            <img
+            <Image
               src={product.image}
               alt={product.title}
-              className="object-cover w-full h-full"
+              fill
+              className="object-cover"
             />
           ) : (
             <span className="text-gray-400 p-10">No Image</span>
@@ -87,9 +89,13 @@ export default function ProductDetail({ product }) {
   );
 }
 
-// getStaticPaths & getStaticProps remain the same
+// ------------------- DATA FETCHING -------------------
+
+// Use environment variable with fallback for local development
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
 export async function getStaticPaths() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`);
+  const res = await fetch(`${BASE_URL}/api/products`);
   const products = await res.json();
 
   const paths = products.products.map((product) => ({
@@ -104,16 +110,14 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${params.id}`
-    );
+    const res = await fetch(`${BASE_URL}/api/products/${params.id}`);
     const data = await res.json();
 
     return {
       props: {
         product: data.product || null,
       },
-      revalidate: 60,
+      revalidate: 60, // ISR: update every 60s
     };
   } catch (err) {
     return { props: { product: null } };
