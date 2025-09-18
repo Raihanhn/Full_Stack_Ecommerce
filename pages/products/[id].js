@@ -2,15 +2,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { addToCart } from "../../redux/cartSlice";
+import Link from "next/link";
 import { connectDB } from "@/lib/mongodb";
 import Product from "@/models/Product";
 
 export default function ProductDetail({ product }) {
   const dispatch = useDispatch();
   const router = useRouter();
-  const user = useSelector((state) => state.user.user); // logged-in user
+  const user = useSelector((state) => state.user.user);
 
-  // Redirect if not logged in
+  // Redirect to login if not logged in
   useEffect(() => {
     if (!user) {
       router.replace("/auth/login");
@@ -81,49 +82,50 @@ export default function ProductDetail({ product }) {
           >
             Add to Cart
           </button>
+
+          <Link href="/products">
+            <span className="mt-4 text-blue-600 hover:underline cursor-pointer">
+              ← Back to Products
+            </span>
+          </Link>
         </div>
       </div>
     </div>
   );
 }
 
-// ============================
-// SSG: fetch paths & props from MongoDB
-// ============================
-
+// Generate static paths
 export async function getStaticPaths() {
   await connectDB();
+  const productsData = await Product.find().lean();
 
-  const products = await Product.find().select("_id").lean();
-
-  const paths = products.map((p) => ({
+  const paths = productsData.map((p) => ({
     params: { id: p._id.toString() },
   }));
 
-  return {
-    paths,
-    fallback: "blocking", // generate pages on-demand
-  };
+  return { paths, fallback: "blocking" };
 }
 
+// Fetch single product data
 export async function getStaticProps({ params }) {
   await connectDB();
 
   const productData = await Product.findById(params.id).lean();
 
   if (!productData) {
-    return {
-      notFound: true,
-    };
+    return { notFound: true };
   }
 
+  // Convert _id and Dates to strings for Next.js
   const product = {
     ...productData,
     _id: productData._id.toString(),
+    createdAt: productData.createdAt?.toISOString(),
+    updatedAt: productData.updatedAt?.toISOString(),
   };
 
   return {
     props: { product },
-    revalidate: 60, // ISR: regenerate every 60 seconds
+    revalidate: 60,
   };
 }

@@ -6,7 +6,6 @@ export default function CategoryPage({ category, products }) {
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 capitalize">
             {category}
@@ -18,7 +17,6 @@ export default function CategoryPage({ category, products }) {
           </Link>
         </div>
 
-        {/* Products Grid */}
         {products.length === 0 ? (
           <p className="text-gray-500 text-lg text-center">
             No products found in this category.
@@ -41,7 +39,6 @@ export default function CategoryPage({ category, products }) {
                     <span className="text-gray-400">No Image</span>
                   )}
                 </div>
-
                 <div className="p-4 flex flex-col justify-between h-40">
                   <h2 className="text-lg font-semibold text-gray-800 truncate">
                     {product.title}
@@ -62,22 +59,22 @@ export default function CategoryPage({ category, products }) {
   );
 }
 
-// Fetch products by category directly from MongoDB
+// Fetch products by category
 export async function getServerSideProps({ params }) {
   await connectDB();
 
-  const { category } = params;
-
-  const productsData = await Product.find({ category }).lean();
+  const productsData = await Product.find({ category: params.category }).lean();
 
   const products = productsData.map((p) => ({
     ...p,
     _id: p._id.toString(),
+    createdAt: p.createdAt?.toISOString(),
+    updatedAt: p.updatedAt?.toISOString(),
   }));
 
   return {
     props: {
-      category,
+      category: params.category,
       products,
     },
   };

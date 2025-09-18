@@ -2,12 +2,10 @@ import Link from "next/link";
 import { connectDB } from "@/lib/mongodb";
 import Product from "@/models/Product";
 
-// Component
 export default function Categories({ categories, products }) {
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-6">
       <div className="max-w-7xl mx-auto mt-10">
-        {/* Page Heading */}
         <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
           Our Categories
         </h1>
@@ -73,29 +71,27 @@ export default function Categories({ categories, products }) {
   );
 }
 
-// Fetch data from MongoDB directly at build time
+// Fetch categories and products from MongoDB
 export async function getStaticProps() {
   await connectDB();
 
-  // Fetch all products
   const productsData = await Product.find().lean();
 
-  // Get unique categories from products
-  const categoriesData = [
-    ...new Set(productsData.map((product) => product.category)),
-  ];
+  const categoriesSet = new Set(productsData.map((p) => p.category));
+  const categories = Array.from(categoriesSet);
 
-  // Convert _id to string (required for Next.js)
   const products = productsData.map((p) => ({
     ...p,
     _id: p._id.toString(),
+    createdAt: p.createdAt?.toISOString(),
+    updatedAt: p.updatedAt?.toISOString(),
   }));
 
   return {
     props: {
-      categories: categoriesData,
+      categories: categories.length ? categories : ["electronics", "fashion", "books"],
       products,
     },
-    revalidate: 60, // Re-generate the page every 60s
+    revalidate: 60,
   };
 }
