@@ -1,6 +1,9 @@
 import Link from "next/link";
+import { connectDB } from "@/lib/mongodb";
+import Product from "@/models/Product";
 
-export default function Categories({ categories, products = [] }) {
+// Component
+export default function Categories({ categories, products }) {
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-6">
       <div className="max-w-7xl mx-auto mt-10">
@@ -70,27 +73,29 @@ export default function Categories({ categories, products = [] }) {
   );
 }
 
-// Fetch categories and products
+// Fetch data from MongoDB directly at build time
 export async function getStaticProps() {
-  const [categoriesRes, productsRes] = await Promise.all([
-    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories`),
-    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`),
-  ]);
+  await connectDB();
 
-  const categoriesData = await categoriesRes.json();
-  const productsData = await productsRes.json();
+  // Fetch all products
+  const productsData = await Product.find().lean();
+
+  // Get unique categories from products
+  const categoriesData = [
+    ...new Set(productsData.map((product) => product.category)),
+  ];
+
+  // Convert _id to string (required for Next.js)
+  const products = productsData.map((p) => ({
+    ...p,
+    _id: p._id.toString(),
+  }));
 
   return {
     props: {
-      categories: categoriesData.categories || [
-        "electronics",
-        "fashion",
-        "books",
-        "toys",
-        "beauty",
-      ],
-      products: productsData.products || [],
+      categories: categoriesData,
+      products,
     },
-    revalidate: 60,
+    revalidate: 60, // Re-generate the page every 60s
   };
 }

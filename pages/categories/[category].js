@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { connectDB } from "@/lib/mongodb";
+import Product from "@/models/Product";
 
 export default function CategoryPage({ category, products }) {
   return (
@@ -60,19 +62,23 @@ export default function CategoryPage({ category, products }) {
   );
 }
 
-// Fetch products by category
+// Fetch products by category directly from MongoDB
 export async function getServerSideProps({ params }) {
+  await connectDB();
+
   const { category } = params;
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/products?category=${category}`
-  );
-  const data = await res.json();
+  const productsData = await Product.find({ category }).lean();
+
+  const products = productsData.map((p) => ({
+    ...p,
+    _id: p._id.toString(),
+  }));
 
   return {
     props: {
       category,
-      products: data.products || [],
+      products,
     },
   };
 }

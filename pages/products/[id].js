@@ -2,7 +2,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { addToCart } from "../../redux/cartSlice";
-import Image from "next/image";
 
 export default function ProductDetail({ product }) {
   const dispatch = useDispatch();
@@ -42,13 +41,12 @@ export default function ProductDetail({ product }) {
     <div className="min-h-screen bg-gray-50 py-10 px-6">
       <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-10 mt-10">
         {/* Product Image */}
-        <div className="bg-white rounded-2xl shadow-md overflow-hidden flex items-center justify-center relative h-96">
+        <div className="bg-white rounded-2xl shadow-md overflow-hidden flex items-center justify-center">
           {product.image ? (
-            <Image
+            <img
               src={product.image}
               alt={product.title}
-              fill
-              className="object-cover"
+              className="object-cover w-full h-full"
             />
           ) : (
             <span className="text-gray-400 p-10">No Image</span>
@@ -89,26 +87,35 @@ export default function ProductDetail({ product }) {
   );
 }
 
-// ------------------- DATA FETCHING -------------------
+// getStaticPaths & getStaticProps remain the same
+export async function getStaticPaths() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`);
+  const products = await res.json();
 
-// Use relative URL for API calls to work on Vercel
-export async function getServerSideProps({ params }) {
+  const paths = products.products.map((product) => ({
+    params: { id: product._id },
+  }));
+
+  return {
+    paths,
+    fallback: "blocking",
+  };
+}
+
+export async function getStaticProps({ params }) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/api/products/${params.id}`);
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${params.id}`
+    );
     const data = await res.json();
 
     return {
       props: {
         product: data.product || null,
       },
+      revalidate: 60,
     };
   } catch (err) {
-    console.error("Error fetching product:", err);
-
-    return {
-      props: {
-        product: null,
-      },
-    };
+    return { props: { product: null } };
   }
 }
