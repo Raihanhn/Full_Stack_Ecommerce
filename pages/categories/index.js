@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image"; // Optional: use Next.js Image for optimization
 
 export default function Categories({ categories, products = [] }) {
   return (
@@ -38,12 +39,13 @@ export default function Categories({ categories, products = [] }) {
                   key={product._id}
                   className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition"
                 >
-                  <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+                  <div className="w-full h-48 bg-gray-100 flex items-center justify-center relative">
                     {product.image ? (
-                      <img
+                      <Image
                         src={product.image}
                         alt={product.title}
-                        className="object-cover h-full w-full"
+                        fill
+                        className="object-cover"
                       />
                     ) : (
                       <span className="text-gray-400">No Image</span>
@@ -70,27 +72,42 @@ export default function Categories({ categories, products = [] }) {
   );
 }
 
-// Fetch categories and products
+// ------------------- DATA FETCHING -------------------
+
+// Use environment variable with fallback for local dev
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
 export async function getStaticProps() {
-  const [categoriesRes, productsRes] = await Promise.all([
-    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories`),
-    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`),
-  ]);
+  try {
+    const [categoriesRes, productsRes] = await Promise.all([
+      fetch(`${BASE_URL}/api/categories`).catch(() => ({ ok: false })),
+      fetch(`${BASE_URL}/api/products`).catch(() => ({ ok: false })),
+    ]);
 
-  const categoriesData = await categoriesRes.json();
-  const productsData = await productsRes.json();
+    const categoriesData = categoriesRes.ok ? await categoriesRes.json() : null;
+    const productsData = productsRes.ok ? await productsRes.json() : null;
 
-  return {
-    props: {
-      categories: categoriesData.categories || [
-        "electronics",
-        "fashion",
-        "books",
-        "toys",
-        "beauty",
-      ],
-      products: productsData.products || [],
-    },
-    revalidate: 60,
-  };
+    return {
+      props: {
+        categories: categoriesData?.categories || [
+          "electronics",
+          "fashion",
+          "books",
+          "toys",
+          "beauty",
+        ],
+        products: productsData?.products || [],
+      },
+      revalidate: 60, // ISR
+    };
+  } catch (err) {
+    // fallback data in case of any error
+    return {
+      props: {
+        categories: ["electronics", "fashion", "books", "toys", "beauty"],
+        products: [],
+      },
+      revalidate: 60,
+    };
+  }
 }

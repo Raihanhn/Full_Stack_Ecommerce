@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image"; // optional: better image optimization
 
 export default function CategoryPage({ category, products }) {
   return (
@@ -28,12 +29,13 @@ export default function CategoryPage({ category, products }) {
                 key={product._id}
                 className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition"
               >
-                <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+                <div className="w-full h-48 bg-gray-100 flex items-center justify-center relative">
                   {product.image ? (
-                    <img
+                    <Image
                       src={product.image}
                       alt={product.title}
-                      className="object-cover h-full w-full"
+                      fill
+                      className="object-cover"
                     />
                   ) : (
                     <span className="text-gray-400">No Image</span>
@@ -60,19 +62,32 @@ export default function CategoryPage({ category, products }) {
   );
 }
 
-// Fetch products by category
+// ------------------- DATA FETCHING -------------------
+
+// Use SSR but with graceful error handling
 export async function getServerSideProps({ params }) {
   const { category } = params;
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/products?category=${category}`
-  );
-  const data = await res.json();
+  try {
+    const res = await fetch(`${BASE_URL}/api/products?category=${category}`);
+    const data = await res.json();
 
-  return {
-    props: {
-      category,
-      products: data.products || [],
-    },
-  };
+    return {
+      props: {
+        category,
+        products: data.products || [],
+      },
+    };
+  } catch (err) {
+    console.error("Error fetching products by category:", err);
+
+    // fallback in case of error
+    return {
+      props: {
+        category,
+        products: [],
+      },
+    };
+  }
 }
