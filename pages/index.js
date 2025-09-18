@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useSelector } from "react-redux";
+import { connectDB } from "@/lib/mongodb";
+import Product from "@/models/Product";
 
 export default function Home({ products }) {
   const cartItems = useSelector((state) => state.cart.items);
@@ -71,12 +74,14 @@ export default function Home({ products }) {
                   key={product._id}
                   className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition"
                 >
-                  <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+                  <div className="w-full h-48 bg-gray-100 flex items-center justify-center relative">
                     {product.image ? (
-                      <img
+                      <Image
                         src={product.image}
                         alt={product.title}
-                        className="object-cover h-full w-full"
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                       />
                     ) : (
                       <span className="text-gray-400">No Image</span>
@@ -103,14 +108,21 @@ export default function Home({ products }) {
   );
 }
 
-// Fetch products from API for home page
+// Fetch products safely for SSR
 export async function getServerSideProps() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`);
-  const data = await res.json();
+  await connectDB();
+
+  const productsData = await Product.find().lean();
+
+  // Convert MongoDB objects to JSON-serializable format
+  const products = productsData.map((p) => ({
+    ...p,
+    _id: p._id.toString(),
+    createdAt: p.createdAt?.toISOString(),
+    updatedAt: p.updatedAt?.toISOString(),
+  }));
 
   return {
-    props: {
-      products: data.products || [],
-    },
+    props: { products },
   };
 }
