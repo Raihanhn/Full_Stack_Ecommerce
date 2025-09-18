@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";  // ✅ Import dispatch
 import { login } from "@/redux/userSlice";   // ✅ Import your Redux login action
+import Link from "next/link";
 
 export default function Login() {
   const router = useRouter();
@@ -81,9 +82,9 @@ export default function Login() {
 
         <p className="mt-4 text-center text-gray-500">
           Don’t have an account?{" "}
-          <a href="/auth/signup" className="text-blue-500 hover:underline">
+          <Link href="/auth/signup" className="text-blue-500 hover:underline">
             Sign Up
-          </a>
+          </Link>
         </p>
       </form>
     </div>

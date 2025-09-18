@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 export default function Signup() {
   const router = useRouter();
@@ -80,9 +81,9 @@ export default function Signup() {
 
         <p className="mt-4 text-center text-gray-500">
           Already have an account?{" "}
-          <a href="/auth/login" className="text-blue-500 hover:underline">
+          <Link href="/auth/login" className="text-blue-500 hover:underline">
             Login
-          </a>
+          </Link>
         </p>
       </form>
     </div>
