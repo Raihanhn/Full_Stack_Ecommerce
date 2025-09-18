@@ -91,12 +91,10 @@ export default function ProductDetail({ product }) {
 
 // ------------------- DATA FETCHING -------------------
 
-// Use server-side props instead of static props
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-
+// Use relative URL for API calls to work on Vercel
 export async function getServerSideProps({ params }) {
   try {
-    const res = await fetch(`${BASE_URL}/api/products/${params.id}`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/api/products/${params.id}`);
     const data = await res.json();
 
     return {
@@ -105,6 +103,12 @@ export async function getServerSideProps({ params }) {
       },
     };
   } catch (err) {
-    return { props: { product: null } };
+    console.error("Error fetching product:", err);
+
+    return {
+      props: {
+        product: null,
+      },
+    };
   }
 }
