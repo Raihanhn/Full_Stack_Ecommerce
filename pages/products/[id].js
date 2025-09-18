@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { addToCart } from "../../redux/cartSlice";
-import Image from "next/image"; // ✅ Use Next.js Image
+import Image from "next/image";
 
 export default function ProductDetail({ product }) {
   const dispatch = useDispatch();
@@ -91,24 +91,10 @@ export default function ProductDetail({ product }) {
 
 // ------------------- DATA FETCHING -------------------
 
-// Use environment variable with fallback for local development
+// Use server-side props instead of static props
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
-export async function getStaticPaths() {
-  const res = await fetch(`${BASE_URL}/api/products`);
-  const products = await res.json();
-
-  const paths = products.products.map((product) => ({
-    params: { id: product._id },
-  }));
-
-  return {
-    paths,
-    fallback: "blocking",
-  };
-}
-
-export async function getStaticProps({ params }) {
+export async function getServerSideProps({ params }) {
   try {
     const res = await fetch(`${BASE_URL}/api/products/${params.id}`);
     const data = await res.json();
@@ -117,7 +103,6 @@ export async function getStaticProps({ params }) {
       props: {
         product: data.product || null,
       },
-      revalidate: 60, // ISR: update every 60s
     };
   } catch (err) {
     return { props: { product: null } };
