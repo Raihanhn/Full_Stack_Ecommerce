@@ -1,10 +1,10 @@
 import Link from "next/link";
-import Image from "next/image";
 
 export default function Categories({ categories, products = [] }) {
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-6">
       <div className="max-w-7xl mx-auto mt-10">
+        {/* Page Heading */}
         <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
           Our Categories
         </h1>
@@ -38,13 +38,12 @@ export default function Categories({ categories, products = [] }) {
                   key={product._id}
                   className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition"
                 >
-                  <div className="w-full h-48 bg-gray-100 flex items-center justify-center relative">
+                  <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
                     {product.image ? (
-                      <Image
+                      <img
                         src={product.image}
                         alt={product.title}
-                        fill
-                        className="object-cover"
+                        className="object-cover h-full w-full"
                       />
                     ) : (
                       <span className="text-gray-400">No Image</span>
@@ -71,39 +70,27 @@ export default function Categories({ categories, products = [] }) {
   );
 }
 
-// ------------------- DATA FETCHING -------------------
-
-// Use relative paths for internal API calls
+// Fetch categories and products
 export async function getStaticProps() {
-  try {
-    const [categoriesRes, productsRes] = await Promise.all([
-      fetch(`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/api/categories`),
-      fetch(`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/api/products`),
-    ]);
+  const [categoriesRes, productsRes] = await Promise.all([
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/categories`),
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`),
+  ]);
 
-    const categoriesData = await categoriesRes.json();
-    const productsData = await productsRes.json();
+  const categoriesData = await categoriesRes.json();
+  const productsData = await productsRes.json();
 
-    return {
-      props: {
-        categories: categoriesData.categories || [
-          "electronics",
-          "fashion",
-          "books",
-          "toys",
-          "beauty",
-        ],
-        products: productsData.products || [],
-      },
-      revalidate: 60,
-    };
-  } catch (err) {
-    return {
-      props: {
-        categories: ["electronics", "fashion", "books", "toys", "beauty"],
-        products: [],
-      },
-      revalidate: 60,
-    };
-  }
+  return {
+    props: {
+      categories: categoriesData.categories || [
+        "electronics",
+        "fashion",
+        "books",
+        "toys",
+        "beauty",
+      ],
+      products: productsData.products || [],
+    },
+    revalidate: 60,
+  };
 }
