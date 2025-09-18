@@ -1,10 +1,21 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 import { addToCart } from "../../redux/cartSlice";
 
 export default function ProductDetail({ product }) {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const user = useSelector((state) => state.user.user); // get logged-in user
 
-   const handleAddToCart = () => {
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!user) {
+      router.replace("/auth/login"); // redirect to login
+    }
+  }, [user, router]);
+
+  const handleAddToCart = () => {
     dispatch(addToCart(product));
     alert("✅ Added to Cart!");
   };
@@ -13,6 +24,15 @@ export default function ProductDetail({ product }) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-gray-500 text-lg">Product not found.</p>
+      </div>
+    );
+  }
+
+  // While redirecting, optionally show a loading state
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-500 text-lg">Redirecting to login...</p>
       </div>
     );
   }
@@ -67,7 +87,7 @@ export default function ProductDetail({ product }) {
   );
 }
 
-// Generate all product paths at build time
+// getStaticPaths & getStaticProps remain the same
 export async function getStaticPaths() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products`);
   const products = await res.json();
@@ -78,11 +98,10 @@ export async function getStaticPaths() {
 
   return {
     paths,
-    fallback: "blocking", // if product page not pre-rendered, generate it on demand
+    fallback: "blocking",
   };
 }
 
-// Fetch product data at build time
 export async function getStaticProps({ params }) {
   try {
     const res = await fetch(
@@ -94,7 +113,7 @@ export async function getStaticProps({ params }) {
       props: {
         product: data.product || null,
       },
-      revalidate: 60, // optional: regenerate the page every 60s
+      revalidate: 60,
     };
   } catch (err) {
     return { props: { product: null } };
