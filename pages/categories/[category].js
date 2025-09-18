@@ -64,13 +64,13 @@ export default function CategoryPage({ category, products }) {
 
 // ------------------- DATA FETCHING -------------------
 
-// Use SSR but with graceful error handling
+// Use relative path for internal API call
 export async function getServerSideProps({ params }) {
   const { category } = params;
-  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
   try {
-    const res = await fetch(`${BASE_URL}/api/products?category=${category}`);
+    // Use relative URL, works both locally and on Vercel
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/api/products?category=${category}`);
     const data = await res.json();
 
     return {
@@ -82,7 +82,6 @@ export async function getServerSideProps({ params }) {
   } catch (err) {
     console.error("Error fetching products by category:", err);
 
-    // fallback in case of error
     return {
       props: {
         category,

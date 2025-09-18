@@ -1,11 +1,10 @@
 import Link from "next/link";
-import Image from "next/image"; // Optional: use Next.js Image for optimization
+import Image from "next/image";
 
 export default function Categories({ categories, products = [] }) {
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-6">
       <div className="max-w-7xl mx-auto mt-10">
-        {/* Page Heading */}
         <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
           Our Categories
         </h1>
@@ -74,34 +73,31 @@ export default function Categories({ categories, products = [] }) {
 
 // ------------------- DATA FETCHING -------------------
 
-// Use environment variable with fallback for local dev
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-
+// Use relative paths for internal API calls
 export async function getStaticProps() {
   try {
     const [categoriesRes, productsRes] = await Promise.all([
-      fetch(`${BASE_URL}/api/categories`).catch(() => ({ ok: false })),
-      fetch(`${BASE_URL}/api/products`).catch(() => ({ ok: false })),
+      fetch(`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/api/categories`),
+      fetch(`${process.env.NEXT_PUBLIC_BASE_PATH || ""}/api/products`),
     ]);
 
-    const categoriesData = categoriesRes.ok ? await categoriesRes.json() : null;
-    const productsData = productsRes.ok ? await productsRes.json() : null;
+    const categoriesData = await categoriesRes.json();
+    const productsData = await productsRes.json();
 
     return {
       props: {
-        categories: categoriesData?.categories || [
+        categories: categoriesData.categories || [
           "electronics",
           "fashion",
           "books",
           "toys",
           "beauty",
         ],
-        products: productsData?.products || [],
+        products: productsData.products || [],
       },
-      revalidate: 60, // ISR
+      revalidate: 60,
     };
   } catch (err) {
-    // fallback data in case of any error
     return {
       props: {
         categories: ["electronics", "fashion", "books", "toys", "beauty"],
