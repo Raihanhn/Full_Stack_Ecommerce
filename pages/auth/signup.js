@@ -40,7 +40,7 @@ export default function Signup() {
         className="bg-white p-8 rounded shadow-md w-full max-w-md"
         onSubmit={handleSubmit}
       >
-        <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center  text-gray-800">Sign Up</h2>
 
         {error && <p className="text-red-500 mb-4">{error}</p>}
 
@@ -51,7 +51,7 @@ export default function Signup() {
           value={form.name}
           onChange={handleChange}
           required
-          className="w-full p-3 mb-4 border rounded"
+          className="w-full p-3 mb-4 border rounded  text-gray-900 placeholder-gray-500"
         />
         <input
           type="email"
@@ -60,7 +60,7 @@ export default function Signup() {
           value={form.email}
           onChange={handleChange}
           required
-          className="w-full p-3 mb-4 border rounded"
+          className="w-full p-3 mb-4 border rounded  text-gray-900 placeholder-gray-500"
         />
         <input
           type="password"
@@ -69,7 +69,7 @@ export default function Signup() {
           value={form.password}
           onChange={handleChange}
           required
-          className="w-full p-3 mb-4 border rounded"
+          className="w-full p-3 mb-4 border rounded  text-gray-900 placeholder-gray-500"
         />
 
         <button
@@ -79,7 +79,7 @@ export default function Signup() {
           Sign Up
         </button>
 
-        <p className="mt-4 text-center text-gray-500">
+        <p className="mt-4 text-center text-gray-600">
           Already have an account?{" "}
           <Link href="/auth/login" className="text-blue-500 hover:underline">
             Login
