@@ -202,34 +202,46 @@ export default function Navbar() {
       {menuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200">
           <Link href="/">
-            <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+            <div className="px-4 py-2 text-gray-800 hover:bg-blue-100 cursor-pointer"
+            onClick={() => setMenuOpen(false)}
+            >
               Home
             </div>
           </Link>
           <Link href="/products">
-            <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+            <div className="px-4 py-2 text-gray-800 hover:bg-blue-100 cursor-pointer"
+            onClick={() => setMenuOpen(false)}
+            >
               Products
             </div>
           </Link>
           <Link href="/categories">
-            <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+            <div className="px-4 py-2 text-gray-800 hover:bg-blue-100 cursor-pointer"
+            onClick={() => setMenuOpen(false)}
+            >
               Categories
             </div>
           </Link>
           <Link href="/about">
-            <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+            <div className="px-4 py-2 text-gray-800 hover:bg-blue-100 cursor-pointer"
+            onClick={() => setMenuOpen(false)}
+            >
               About
             </div>
           </Link>
           {!user && (
             <>
               <Link href="/auth/login">
-                <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+                <div className="px-4 py-2 text-gray-800 hover:bg-blue-100 cursor-pointer"
+                onClick={() => setMenuOpen(false)}
+                >
                   Sign In
                 </div>
               </Link>
               <Link href="/auth/signup">
-                <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+                <div className="px-4 py-2 text-gray-800 hover:bg-blue-100 cursor-pointer"
+                onClick={() => setMenuOpen(false)}
+                >
                   Sign Up
                 </div>
               </Link>
@@ -238,13 +250,18 @@ export default function Navbar() {
           {user && (
             <>
               <Link href="/profile">
-                <div className="px-4 py-2 hover:bg-blue-100 cursor-pointer">
+                <div className="px-4 py-2 text-gray-800 hover:bg-blue-100 cursor-pointer"
+                onClick={() => setMenuOpen(false)}
+                >
                   My Profile
                 </div>
               </Link>
               <div
-                onClick={handleLogout}
-                className="px-4 py-2 hover:bg-blue-100 cursor-pointer"
+                onClick={() => {
+                  handleLogout();
+                  setMenuOpen(false);
+                }}
+                className="px-4 py-2 text-gray-800 hover:bg-blue-100 cursor-pointer"
               >
                 Logout
               </div>
