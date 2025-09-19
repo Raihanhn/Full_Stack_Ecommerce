@@ -6,12 +6,12 @@ export default function CategoryPage({ category, products }) {
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-6">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-8 mt-10">
           <h1 className="text-3xl font-bold text-gray-800 capitalize">
             {category}
           </h1>
           <Link href="/categories">
-            <span className="text-blue-600 hover:underline cursor-pointer">
+            <span className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 transition cursor-pointer">
               ← Back to Categories
             </span>
           </Link>

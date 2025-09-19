@@ -68,7 +68,8 @@ export default function Home({ products }) {
             <h2 className="text-2xl font-bold mb-8 text-gray-800">
               {searchQuery ? "Search Results" : "Featured Products"}
             </h2>
-            <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {/* <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"> */}
+            <div className="grid gap-8 grid-cols-[repeat(auto-fit,minmax(250px,1fr))]">
               {filteredProducts.map((product) => (
                 <div
                   key={product._id}
